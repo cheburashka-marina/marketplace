@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Все товары</h2>
+    
+    <!-- Поиск и фильтрация -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="get" class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Поиск товаров..."
+                       value="{{ request.args.get('search', '') }}">
+                <button class="btn btn-outline-secondary" type="submit">Найти</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <select class="form-select" onchange="window.location.href=this.value">
+                <option value="{{ url_for('products_list') }}">Все категории</option>
+                {% for cat in ['electronics', 'clothing', 'books', 'home', 'other'] %}
+                <option value="{{ url_for('products_list', category=cat) }}"
+                        {% if request.args.get('category') == cat %}selected{% endif %}>
+                    {{ cat }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Список товаров -->
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <a href="/product/{{ product.id }}">
+                    <img src="{{ product.image_url or 'https://via.placeholder.com/150' }}"
+                         class="card-img-top"
+                         alt="{{ product.title }}"
+                         style="height: 200px; object-fit: cover;">
+                </a>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <a href="/product/{{ product.id }}" class="text-decoration-none text-dark">
+                            {{ product.title }}
+                        </a>
+                    </h5>
+                    <p class="card-text">{{ product.price }} руб.</p>
+                    <div class="mt-auto">
+                        <a href="/product/{{ product.id }}" class="btn btn-outline-primary w-100 mb-2">Подробнее</a>
+                        {% if current_user.is_authenticated %}
+                            <form action="/add_to_cart/{{ product.id }}" method="post" class="d-inline w-100">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-success w-100">В корзину</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">Товары не найдены</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация - вставляется здесь -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+            {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products_list', page=page-1, search=request.args.get('search'), category=request.args.get('category')) }}">Назад</a>
+            </li>
+            {% endif %}
+
+            {% for p in range(1, total_pages+1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('products_list', page=p, search=request.args.get('search'), category=request.args.get('category')) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page < total_pages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products_list', page=page+1, search=request.args.get('search'), category=request.args.get('category')) }}">Вперед</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

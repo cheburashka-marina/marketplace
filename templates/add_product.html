@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Добавить новый товар</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Основная информация -->
+                <div class="card mb-4">
+                    <div class="card-header">Основная информация</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control", placeholder="Введите название товара") }}
+                            <div class="invalid-feedback">
+                                Пожалуйста, укажите название товара
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category(class="form-select") }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.price.label(class="form-label") }}
+                                    <div class="input-group">
+                                        {{ form.price(class="form-control", placeholder="0.00") }}
+                                        <span class="input-group-text">₽</span>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, укажите цену
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.quantity.label(class="form-label") }}
+                                    {{ form.quantity(class="form-control", min=1) }}
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, укажите количество (не менее 1)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Добавленные поля для скидки -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.discount_percent.label(class="form-label") }}
+                                    {{ form.discount_percent(class="form-control", placeholder="0-99") }}
+                                    <div class="invalid-feedback">
+                                        Пожалуйста, укажите скидку от 0 до 99%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 form-check">
+                                    {{ form.is_discount_active(class="form-check-input") }}
+                                    {{ form.is_discount_active.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.promo_code.label(class="form-label") }}
+                            {{ form.promo_code(class="form-control", placeholder="Промокод (если есть)") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Изображение -->
+                <div class="card mb-4">
+                    <div class="card-header">Изображение товара</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="image_file" class="form-label">Загрузить изображение</label>
+                            <input class="form-control" type="file" id="image_file" name="image_file" accept="image/*">
+                            <div class="form-text">Или укажите URL изображения</div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.image_url.label(class="form-label") }}
+                            {{ form.image_url(class="form-control", placeholder="https://example.com/image.jpg") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Описание -->
+        <div class="card mb-4">
+            <div class="card-header">Описание товара</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control", rows=5, placeholder="Подробное описание товара...") }}
+                    <div class="invalid-feedback">
+                        Пожалуйста, добавьте описание товара
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            {{ form.submit(class="btn btn-primary btn-lg") }}
+        </div>
+    </form>
+</div>
+
+<script>
+// Валидация формы
+(function() {
+    'use strict'
+
+    const forms = document.querySelectorAll('.needs-validation')
+
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

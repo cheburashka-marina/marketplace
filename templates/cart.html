@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Корзина</h2>
+    {% if not products %}
+    <div class="alert alert-info">
+        Ваша корзина пуста. <a href="{{ url_for('products_list') }}">Посмотреть товары</a>
+    </div>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="table-light">
+                <tr>
+                    <th>Товар</th>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Сумма</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('product_detail', id=product.id) }}" class="text-decoration-none">
+                            {{ product.title }}
+                        </a>
+                    </td>
+                    <td>{{ product.price }} руб.</td>
+                    <td>
+                        <div class="input-group" style="width: 120px;">
+                            <input type="number" value="{{ quantities[product.id] }}" min="1" class="form-control">
+                            <button class="btn btn-outline-secondary" type="button">Обновить</button>
+                        </div>
+                    </td>
+                    <td>{{ product.price * quantities[product.id] }} руб.</td>
+                    <td>
+                        <a href="{{ url_for('remove_from_cart', product_id=product.id) }}"
+                           class="btn btn-danger btn-sm">
+                            &times;
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <th colspan="3">Сумма:</th>
+                    <th colspan="2">{{ total_before_discount }} руб.</th>
+                </tr>
+                {% if total_discount > 0 %}
+                <tr>
+                    <th colspan="3">Скидка:</th>
+                    <th colspan="2" class="text-danger">-{{ total_discount }} руб.</th>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th colspan="3">Итого:</th>
+                    <th colspan="2">{{ total }} руб.</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Форма для применения промокода -->
+    <div class="card mb-4">
+        <div class="card-header">Применить промокод</div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('apply_promo') }}" class="input-group">
+                <input type="text" name="promo_code" class="form-control" placeholder="Введите промокод">
+                <button type="submit" class="btn btn-success">Применить</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ url_for('products_list') }}" class="btn btn-outline-secondary">
+            Продолжить покупки
+        </a>
+        <a href="{{ url_for('checkout') }}" class="btn btn-primary">
+            Оформить заказ
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

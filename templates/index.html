@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Баннер -->
+<div class="banner mb-4" style="height: 200px; background-color: #f8f9fa; border-radius: 8px; overflow: hidden;">
+    <img src="/static/images/banner-desktop.png"
+         alt="Маркетплейс"
+         class="w-100 h-100 d-none d-md-block"
+         style="object-fit: cover;">
+    <img src="/static/images/banner-desktop.png"
+         alt="Маркетплейс"
+         class="w-100 h-100 d-md-none"
+         style="object-fit: cover;">
+</div>
+
+<!-- Сетка товаров -->
+<div class="row">
+    {% for product in products %}  <!-- Убедитесь что цикл есть и products определен -->
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <a href="/product/{{ product.id }}">
+                <img src="{{ product.image_url or 'https://via.placeholder.com/150' }}"
+                     class="card-img-top"
+                     alt="{{ product.title }}"
+                     style="height: 200px; object-fit: cover;">
+            </a>
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="/product/{{ product.id }}" class="text-decoration-none text-dark">
+                        {{ product.title }}
+                    </a>
+                </h5>
+                <p class="card-text">{{ product.price }} руб.</p>
+                <div class="d-flex gap-2">
+                    <a href="/product/{{ product.id }}" class="btn btn-outline-primary flex-grow-1">Подробнее</a>
+                    {% if current_user.is_authenticated %}
+                    <a href="/add_to_cart/{{ product.id }}" class="btn btn-success">Купить</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">Товары не найдены</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

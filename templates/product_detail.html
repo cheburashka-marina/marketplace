@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% if product.is_discount_active and product.discount_percent > 0 %}
+    <div class="alert alert-success mt-3">
+        <strong>Скидка {{ product.discount_percent }}%</strong>
+        {% if product.promo_code %}
+            по промокоду: <code>{{ product.promo_code }}</code>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ product.image_url or 'https://via.placeholder.com/400' }}"
+                 class="img-fluid rounded"
+                 alt="{{ product.title }}">
+        </div>
+        <div class="col-md-6">
+            <h2>{{ product.title }}</h2>
+            <p class="text-muted">Категория: {{ product.category }}</p>
+            <h3 class="my-4 text-primary">{{ product.price }} руб.</h3>
+            <p>{{ product.description }}</p>
+
+            {% if current_user.is_authenticated %}
+                <form action="/add_to_cart/{{ product.id }}" method="post" class="mb-2">
+                    <button type="submit" class="btn btn-success btn-lg">Добавить в корзину</button>
+                </form>
+
+                {% if product in current_user.favorite_products %}
+                    <a href="/favorites/remove/{{ product.id }}" class="btn btn-outline-danger btn-lg">
+                        <i class="bi bi-heart-fill"></i> В избранном
+                    </a>
+                {% else %}
+                    <a href="/favorites/add/{{ product.id }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-heart"></i> В избранное
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Секция отзывов -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Отзывы</h3>
+
+            {% if current_user.is_authenticated %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>Оставить отзыв</h5>
+                    <form action="/product/{{ product.id }}/review" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Оценка</label>
+                            <select name="rating" class="form-select" required>
+                                <option value="">Выберите оценку</option>
+                                <option value="5">Отлично (5)</option>
+                                <option value="4">Хорошо (4)</option>
+                                <option value="3">Удовлетворительно (3)</option>
+                                <option value="2">Плохо (2)</option>
+                                <option value="1">Ужасно (1)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Текст отзыва</label>
+                            <textarea name="text" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if product.reviews %}
+                {% for review in product.reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5>{{ review.user.name }}</h5>
+                            <div class="text-warning">
+                                {% for i in range(1, 6) %}
+                                    {% if i <= review.rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-muted small">{{ review.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                        <p>{{ review.text }}</p>
+
+                        {% if current_user.id == review.user_id %}
+                        <form action="/review/delete/{{ review.id }}" method="post" class="mt-2">
+                            <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">Пока нет отзывов. Будьте первым!</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

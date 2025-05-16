@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Избранные товары</h2>
+
+    {% if not products %}
+    <div class="alert alert-info mt-4">
+        У вас пока нет избранных товаров.
+        <a href="{{ url_for('products_list') }}">Посмотреть товары</a>
+    </div>
+    {% else %}
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <a href="/product/{{ product.id }}">
+                    <img src="{{ product.image_url or 'https://via.placeholder.com/150' }}"
+                         class="card-img-top"
+                         alt="{{ product.title }}"
+                         style="height: 200px; object-fit: cover;">
+                </a>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <a href="/product/{{ product.id }}" class="text-decoration-none text-dark">
+                            {{ product.title }}
+                        </a>
+                    </h5>
+                    <p class="card-text">
+                        {% if product.is_discount_active %}
+                            <span class="text-danger">{{ product.price * (1 - product.discount_percent/100) | round(2) }} руб.</span>
+                            <small class="text-muted text-decoration-line-through">{{ product.price }} руб.</small>
+                        {% else %}
+                            {{ product.price }} руб.
+                        {% endif %}
+                    </p>
+                    <div class="mt-auto">
+                        <a href="/product/{{ product.id }}" class="btn btn-outline-primary w-100 mb-2">Подробнее</a>
+                        <a href="/favorites/remove/{{ product.id }}" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-heart-fill"></i> Удалить
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
